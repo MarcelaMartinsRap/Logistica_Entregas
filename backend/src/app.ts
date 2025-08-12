@@ -1,14 +1,12 @@
 import express from "express";
 import cors from "cors";
-import "./redisClient";
-
-const PORT = process.env.PORT || 3001;
+import pedidoRouter from "./routes/pedidoRouter";
 
 const app = express();
 
 app.use(express.json());
 app.use(cors());
 
-app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
-});
+app.use("/pedido", pedidoRouter);
+
+export default app;
