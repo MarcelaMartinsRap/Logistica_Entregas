@@ -1,0 +1,106 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Moto {
+  id                    Int           @id @default(autoincrement())
+  placa                 String        @unique
+  modelo                String
+  // bagzinha              Boolean
+  capacidadeCargaQuilos Float
+  status                MotoStatus
+  motoMotoboys          MotoMotoboy[]
+  rotas                 RotaEntrega[]
+}
+
+model Motoboy {
+  id           Int           @id @default(autoincrement())
+  cpf          String        @unique
+  cnh          String        @unique
+  nome         String
+  status       MotoboyStatus
+  motoMotoboys MotoMotoboy[]
+  rotas        RotaEntrega[]
+}
+
+model MotoMotoboy {
+  id        Int     @id @default(autoincrement())
+  motoId    Int
+  motoboyId Int
+  emUso     Boolean @default(false)
+
+  moto    Moto    @relation(fields: [motoId], references: [id])
+  motoboy Motoboy @relation(fields: [motoboyId], references: [id])
+}
+
+model Cliente {
+  id            Int            @id @default(autoincrement())
+  nome          String
+  endereco      String
+  pontosEntrega PontoEntrega[]
+}
+
+model RotaEntrega {
+  id              Int            @id @default(autoincrement())
+  motoboyId       Int
+  motoId          Int
+  dataHoraCriacao DateTime       @default(now())
+  dataHoraSaida   DateTime?
+  dataHoraChegada DateTime?
+  status          RotaStatus
+  pontosEntrega   PontoEntrega[]
+
+  motoboy Motoboy @relation(fields: [motoboyId], references: [id])
+  moto    Moto    @relation(fields: [motoId], references: [id])
+}
+
+model PontoEntrega {
+  id              Int         @id @default(autoincrement())
+  clienteId       Int
+  rotaEntregaId   Int
+  endereco        String
+  peso            Float
+  dataHoraCriacao DateTime    @default(now())
+  dataHoraSaida   DateTime?
+  dataHoraChegada DateTime?
+  status          PontoStatus
+
+  cliente     Cliente     @relation(fields: [clienteId], references: [id])
+  rotaEntrega RotaEntrega @relation(fields: [rotaEntregaId], references: [id])
+}
+
+enum MotoStatus {
+  Disponivel
+  Manutencao
+  EmUso
+}
+
+enum MotoboyStatus {
+  Disponivel
+  EmServico
+  Indisponivel
+}
+
+enum RotaStatus {
+  Planejada
+  ACaminho
+  Concluida
+}
+
+enum PontoStatus {
+  Pendente
+  Concluida
+  Falha
+}
