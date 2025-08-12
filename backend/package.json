@@ -1,4 +1,17 @@
 {
+  "name": "backend",
+  "version": "1.0.0",
+  "main": "app.js",
+  "type": "module",
+  "scripts": {
+    "dev": "ts-node src/app.ts",
+    "seed": "node --loader ts-node/esm prisma/seed.ts",
+    "build": "tsc && prisma generate && npm run copy-files",
+    "copy-files": "mkdir -p dist/prisma && cp -r prisma/schema.prisma dist/prisma/",
+    "start": "cross-env NODE_ENV=production node dist/api.js",
+    "prisma:dev": "dotenv -e .env.development -- prisma",
+    "prisma:prod": "prisma"
+  },
   "devDependencies": {
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.3",
@@ -17,8 +30,5 @@
     "cors": "^2.8.5",
     "express": "^5.1.0",
     "prisma": "^6.13.0"
-  },
-  "scripts": {
-    "dev": "ts-node-dev --respawn --transpile-only src/app.ts"
   }
 }
